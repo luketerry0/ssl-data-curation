@@ -242,7 +242,7 @@ def write_launcher(exp_dir, n_levels, n_splits):
     Write bash script to launch slurm scripts in all levels.
     """
     exp_dir = Path(exp_dir).resolve()
-    with open(Path(exp_dir, "OSCER_launcer.sh"), "w") as f:
+    with open(Path(exp_dir, "OSCER_launcher.sh"), "w") as f:
         f.write(
             f"ID=$(sbatch --parsable {str(exp_dir)}/level1/OSCER-slurm-script.sh | tail -1)\n"
         )
