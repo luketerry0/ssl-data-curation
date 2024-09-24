@@ -72,7 +72,7 @@ srun --unbuffered --output="$EXPDIR"/logs/%j_%t_log.out --error="$EXPDIR"/logs/%
         else:
             f.write("\n")
 
-    with open(Path(level_dir, "local_script.sh"), "w") as f:
+    with open(Path(level_dir, "OSCER-slurm-script.sh"), "w") as f:
 
         f.write(
 f"""#!/usr/bin/env bash
@@ -116,7 +116,7 @@ echo Node IP: $head_node_ip
 # using Dr. Fagg's conda setup script
 . /home/fagg/tf_setup.sh
 # activating a version of my environment
-conda activate ${cfg.slurm_conda_env_dir}
+conda activate {cfg.slurm_conda_env_dir}
 
 PYTHONPATH=.. \\
 srun torchrun \\
@@ -242,9 +242,9 @@ def write_launcher(exp_dir, n_levels, n_splits):
     Write bash script to launch slurm scripts in all levels.
     """
     exp_dir = Path(exp_dir).resolve()
-    with open(Path(exp_dir, "launcher.sh"), "w") as f:
+    with open(Path(exp_dir, "OSCER_launcer.sh"), "w") as f:
         f.write(
-            f"ID=$(sbatch --parsable {str(exp_dir)}/level1/slurm_script.s | tail -1)\n"
+            f"ID=$(sbatch --parsable {str(exp_dir)}/level1/OSCER-slurm-script.sh | tail -1)\n"
         )
         f.write('echo "Level 1: job $ID"\n')
         if n_splits[0] > 1:
@@ -255,7 +255,7 @@ def write_launcher(exp_dir, n_levels, n_splits):
 
         for level_id in range(2, n_levels + 1):
             f.write(
-                f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/slurm_script.s | tail -1)\n'
+                f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/OSCER-slurm-script.sh | tail -1)\n'
             )
             f.write(f'echo "Level {level_id}: job $ID"\n')
             if n_splits[level_id - 1] > 1:
@@ -263,18 +263,6 @@ def write_launcher(exp_dir, n_levels, n_splits):
                     f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/slurm_split_clusters_script.s | tail -1)\n'
                 )
                 f.write('echo "Level {level_id}, split clusters: job $ID"\n')
-
-def write_local_launcher(exp_dir, n_levels, n_splits):
-    """
-    Write bash script to launch slurm scripts in all levels.
-    """
-    exp_dir = Path(exp_dir).resolve()
-    with open(Path(exp_dir, "local_launcher.sh"), "w") as f:
-        f.write("set -e\n")
-        for level_id in range(1, n_levels + 1):
-            f.write(f"bash {str(exp_dir)}/level{level_id}/local_script.sh\n")
-            if n_splits[level_id - 1] > 1:
-                f.write(f"bash {str(exp_dir)}/level{level_id}/local_split_clusters_script.sh\n")
 
 
 if __name__ == "__main__":
@@ -305,4 +293,4 @@ if __name__ == "__main__":
 
     write_slurm_scripts(cfg)
     write_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
-    write_local_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
+    #write_local_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
