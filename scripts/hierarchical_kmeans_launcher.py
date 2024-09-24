@@ -73,13 +73,53 @@ srun --unbuffered --output="$EXPDIR"/logs/%j_%t_log.out --error="$EXPDIR"/logs/%
             f.write("\n")
 
     with open(Path(level_dir, "local_script.sh"), "w") as f:
+
         f.write(
 f"""#!/usr/bin/env bash
+
+#SBATCH --requeue
+#SBATCH --nodes={cfg.nnodes[level_id-1]}
+#SBATCH --gpus-per-node={cfg.ngpus_per_node[level_id-1]}
+#SBATCH --ntasks-per-node={cfg.ngpus_per_node[level_id-1]}
+#SBATCH --job-name=kmeans_level{level_id}
+#SBATCH --output={save_dir}/logs/%j_0_log.out
+#SBATCH --error={save_dir}/logs/%j_0_log.err
+#SBATCH --time=4320
+#SBATCH --signal=USR2@300
+#SBATCH --mail-user=your_email@ou.edu
+#SBATCH --mail-type=ALL
+#SBATCH --open-mode=append\n"""
+        )
+        if cfg.ncpus_per_gpu is not None:
+            f.write(f"#SBATCH --cpus-per-task={cfg.ncpus_per_gpu}\n")
+        if cfg.slurm_partition is not None:
+            f.write(f"#SBATCH --partition={cfg.slurm_partition}\n")
+        if cfg.slurm_partition is not None:
+            f.write(f"#SBATCH --mail-user={cfg.slurm_email}\n")
+            f.write(f"#SBATCH --mail-type=ALL\n")
+        if cfg.slurm_partition is not None:
+            f.write(f"#SBATCH --chdir={cfg.slurm_home_dir}\n")
+
+        f.write(
+f"""
 EXPDIR={save_dir}
 cd {ROOT}
 
+# get the IP of the node used for the master process
+nodes=( $( scontrol show hostnames $SLURM_JOB_NODELIST ) )
+nodes_array=($nodes)
+head_node=${{nodes_array[0]}}
+head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
+
+echo Node IP: $head_node_ip
+
+# using Dr. Fagg's conda setup script
+. /home/fagg/tf_setup.sh
+# activating a version of my environment
+conda activate ${cfg.slurm_conda_env_dir}
+
 PYTHONPATH=.. \\
-torchrun \\
+srun torchrun \\
 --nnodes={cfg.nnodes[level_id-1]} \\
 --nproc_per_node={cfg.ngpus_per_node[level_id-1]} \\
     run_distributed_kmeans.py \\
@@ -94,7 +134,11 @@ torchrun \\
     --exp_dir $EXPDIR \\
     --n_steps {cfg.n_resampling_steps[level_id-1]} \\
     --sample_size {cfg.sample_size[level_id-1]} \\
-    --sampling_strategy {cfg.sampling_strategy}"""
+    --sampling_strategy {cfg.sampling_strategy}
+    --rdzv_id $RANDOM \
+    --rdzv_backend c10d \
+    --rdzv_endpoint "$head_node_ip:64425" \
+"""
         )
         if level_id == 1 and cfg.subset_indices_path is not None:
             f.write(f" \\\n    --subset_indices_path {cfg.subset_indices_path}\n")
