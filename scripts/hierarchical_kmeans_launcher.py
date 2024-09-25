@@ -109,7 +109,9 @@ cd {ROOT}
 nodes=( $( scontrol show hostnames $SLURM_JOB_NODELIST ) )
 nodes_array=($nodes)
 head_node=${{nodes_array[0]}}
-head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
+""")
+        f.write('head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")')
+        f.write(f"""
 
 echo Node IP: $head_node_ip
 
@@ -120,6 +122,9 @@ conda activate {cfg.slurm_conda_env_dir}
 
 PYTHONPATH=.. \\
 srun torchrun \\
+--rdzv_id $RANDOM \\
+--rdzv_backend c10d \\
+--rdzv_endpoint "$head_node_ip:64425" \\
 --nnodes={cfg.nnodes[level_id-1]} \\
 --nproc_per_node={cfg.ngpus_per_node[level_id-1]} \\
     run_distributed_kmeans.py \\
@@ -135,9 +140,6 @@ srun torchrun \\
     --n_steps {cfg.n_resampling_steps[level_id-1]} \\
     --sample_size {cfg.sample_size[level_id-1]} \\
     --sampling_strategy {cfg.sampling_strategy}
-    --rdzv_id $RANDOM \
-    --rdzv_backend c10d \
-    --rdzv_endpoint "$head_node_ip:64425" \
 """
         )
         if level_id == 1 and cfg.subset_indices_path is not None:
