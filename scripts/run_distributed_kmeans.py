@@ -11,6 +11,7 @@ import subprocess
 
 import numpy as np
 import torch
+import os
 
 from src import (
     distributed_kmeans_gpu as dkmg,
@@ -224,6 +225,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    torch.cuda.set_device(int(os.environ['RANK']) % torch.cuda.device_count())
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", type=str, required=True)
     parser.add_argument("--subset_indices_path", type=str, default=None)

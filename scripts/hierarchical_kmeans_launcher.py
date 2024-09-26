@@ -79,14 +79,12 @@ f"""#!/usr/bin/env bash
 
 #SBATCH --requeue
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
-#SBATCH --gpus-per-node={cfg.ngpus_per_node[level_id-1]}
-#SBATCH --ntasks-per-node={cfg.ngpus_per_node[level_id-1]}
+#SBATCH --gres=gpu:{cfg.ngpus_per_node[level_id-1]}
+#SBATCH --ntasks={cfg.nnodes[level_id-1]}
 #SBATCH --job-name=kmeans_level{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
 #SBATCH --error={save_dir}/logs/%j_0_log.err
-#SBATCH --time=4320
-#SBATCH --signal=USR2@300
-#SBATCH --mail-user=your_email@ou.edu
+#SBATCH --mail-user={cfg.slurm_email}
 #SBATCH --mail-type=ALL
 #SBATCH --open-mode=append\n"""
         )
@@ -94,11 +92,7 @@ f"""#!/usr/bin/env bash
             f.write(f"#SBATCH --cpus-per-task={cfg.ncpus_per_gpu}\n")
         if cfg.slurm_partition is not None:
             f.write(f"#SBATCH --partition={cfg.slurm_partition}\n")
-        if cfg.slurm_partition is not None:
-            f.write(f"#SBATCH --mail-user={cfg.slurm_email}\n")
-            f.write(f"#SBATCH --mail-type=ALL\n")
-        if cfg.slurm_partition is not None:
-            f.write(f"#SBATCH --chdir={cfg.slurm_home_dir}\n")
+        f.write(f"#SBATCH --chdir={cfg.slurm_home_dir}\n")
 
         f.write(
 f"""
@@ -110,7 +104,7 @@ nodes=( $( scontrol show hostnames $SLURM_JOB_NODELIST ) )
 nodes_array=($nodes)
 head_node=${{nodes_array[0]}}
 """)
-        f.write('head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")')
+        f.write('head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\\b([0-9]{1,3}\.){3}[0-9]{1,3}\\b")')
         f.write(f"""
 
 echo Node IP: $head_node_ip
@@ -125,7 +119,7 @@ srun torchrun \\
 --rdzv_id $RANDOM \\
 --rdzv_backend c10d \\
 --rdzv_endpoint "$head_node_ip:64425" \\
---nnodes={cfg.nnodes[level_id-1]} \\
+--nnodes=$SLURM_JOB_NUM_NODES \\
 --nproc_per_node={cfg.ngpus_per_node[level_id-1]} \\
     run_distributed_kmeans.py \\
     --use_torchrun \\
