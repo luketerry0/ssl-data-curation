@@ -47,6 +47,7 @@ def main(args):
     enable_distributed(
         use_torchrun=args.use_torchrun,
         overwrite=True,
+        set_cuda_current_device=False
     )
 
     X_ori = np.load(args.data_path, mmap_mode="r")

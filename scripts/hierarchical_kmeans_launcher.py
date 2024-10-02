@@ -36,7 +36,7 @@ f"""#!/usr/bin/env bash
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
 #SBATCH --gpus-per-node={cfg.ngpus_per_node[level_id-1]}
 #SBATCH --ntasks-per-node={cfg.ngpus_per_node[level_id-1]}
-#SBATCH --job-name=kmeans_level{level_id}
+#SBATCH --job-name={cfg.job_name}_kmeans_{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
 #SBATCH --error={save_dir}/logs/%j_0_log.err
 #SBATCH --time=4320
@@ -81,7 +81,7 @@ f"""#!/usr/bin/env bash
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
 #SBATCH --gres=gpu:{cfg.ngpus_per_node[level_id-1]}
 #SBATCH --ntasks={cfg.nnodes[level_id-1]}
-#SBATCH --job-name=kmeans_level{level_id}
+#SBATCH --job-name={cfg.job_name}_kmeans_level{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
 #SBATCH --error={save_dir}/logs/%j_0_log.err
 #SBATCH --mail-user={cfg.slurm_email}
