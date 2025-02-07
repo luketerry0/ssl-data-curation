@@ -1,0 +1,16 @@
+{'MASTER_ADDR': 'c314.oscer.ou.edu', 'MASTER_PORT': '43259', 'RANK': '1', 'WORLD_SIZE': '2', 'LOCAL_RANK': '0', 'LOCAL_WORLD_SIZE': '1'}
+I20250207 15:10:38 22643 hkmeans distributed_kmeans_gpu.py:94] Rank 1: Loading data
+I20250207 15:11:02 22643 hkmeans distributed_kmeans_gpu.py:101] Rank: 1, X.shape: (632718, 1024), Xi.shape: torch.Size([316359, 1024])
+I20250207 15:11:02 22643 hkmeans run_distributed_kmeans.py:69] Running step 0
+I20250207 15:11:02 22643 hkmeans run_distributed_kmeans.py:125] Begin distributed kmeans
+I20250207 15:11:03 22643 hkmeans distributed_kmeans_gpu.py:390] Initializing the first centroid
+I20250207 15:11:03 22643 hkmeans distributed_kmeans_gpu.py:432] Begin main loop
+I20250207 15:11:03 22643 hkmeans distributed_kmeans_gpu.py:517] Kmeans potential of kmeans++ initialization: 534899961.5197073
+Distributed kmeans interation: 100%|██████████| 1/1 [00:00<00:00,  5.63it/s]
+I20250207 15:11:04 22643 hkmeans run_distributed_kmeans.py:150] Assign points to clusters
+Assigning data points to centroids: 100%|██████████| 1/1 [00:00<00:00, 2699.04it/s]
+I20250207 15:11:04 22643 hkmeans run_distributed_kmeans.py:174] Create clusters from cluster_assignment
+I20250207 15:11:04 22643 hkmeans run_distributed_kmeans.py:189] Sort points in each cluster by distance to centroid
+Distributed sorting clusters by distance:   0%|          | 0/1 [00:00<?, ?it/s]I20250207 15:11:09 22643 hkmeans distributed_kmeans_gpu.py:810] Saving checkpoint to /ourdisk/hpc/ai2es/luketerry/test_config/level1/step0/sorted_clusters_checkpoint_1.npy
+Distributed sorting clusters by distance: 100%|██████████| 1/1 [00:05<00:00,  5.21s/it]
+I20250207 15:11:09 22643 hkmeans run_distributed_kmeans.py:226] Finished all steps!

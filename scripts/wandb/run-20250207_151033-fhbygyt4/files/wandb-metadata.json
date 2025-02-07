@@ -1,0 +1,194 @@
+{
+    "os": "Linux-3.10.0-1127.el7.x86_64-x86_64-with-glibc2.17",
+    "python": "3.10.15",
+    "heartbeatAt": "2025-02-07T21:10:33.512280",
+    "startedAt": "2025-02-07T21:10:33.155074",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--wandb_name",
+        "hierarchical_test",
+        "--use_torchrun",
+        "--data_path",
+        "/ourdisk/hpc/ai2es/luketerry/npy_laion_embeddings/laion_embeddings_shard_0.npy",
+        "--n_clusters",
+        "2",
+        "--n_iters",
+        "1",
+        "--chunk_size",
+        "100000000",
+        "--dtype",
+        "float64",
+        "--high_precision",
+        "float64",
+        "--checkpoint_period",
+        "1000",
+        "--exp_dir",
+        "/ourdisk/hpc/ai2es/luketerry/test_config/level1",
+        "--n_steps",
+        "1",
+        "--sample_size",
+        "1",
+        "--sampling_strategy",
+        "c"
+    ],
+    "state": "running",
+    "program": "/home/luketerry/ssl-data-curation/scripts/run_distributed_kmeans.py",
+    "codePathLocal": "run_distributed_kmeans.py",
+    "codePath": "scripts/run_distributed_kmeans.py",
+    "git": {
+        "remote": "git@github.com:luketerry0/ssl-data-curation.git",
+        "commit": "ae9f6c1fe0ee0b968142a1a4a12da615b57c3604"
+    },
+    "email": "luke.h.terry-1@ou.edu",
+    "root": "/home/luketerry/ssl-data-curation",
+    "host": "c315.oscer.ou.edu",
+    "username": "luketerry",
+    "executable": "/home/luketerry/miniforge3/envs/ssl-data-curation/bin/python3.10",
+    "cpu_count": 24,
+    "cpu_count_logical": 24,
+    "cpu_freq": {
+        "current": 2599.9407500000007,
+        "min": 3100.0,
+        "max": 3100.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2600.134,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.993,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.993,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2600.415,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.713,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2600.415,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.993,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2600.134,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.993,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2600.695,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2600.415,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.572,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.853,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.713,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2599.572,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2601.959,
+            "min": 3100.0,
+            "max": 3100.0
+        },
+        {
+            "current": 2604.766,
+            "min": 3100.0,
+            "max": 3100.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 23.984378814697266,
+            "used": 10.9957275390625
+        }
+    },
+    "gpu": "Tesla V100-PCIE-32GB",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "Tesla V100-PCIE-32GB",
+            "memory_total": 34359738368
+        }
+    ],
+    "memory": {
+        "total": 62.66598892211914
+    }
+}

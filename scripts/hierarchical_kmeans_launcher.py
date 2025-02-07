@@ -36,10 +36,11 @@ f"""#!/usr/bin/env bash
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
 #SBATCH --gpus-per-node={cfg.ngpus_per_node[level_id-1]}
 #SBATCH --ntasks-per-node={cfg.ngpus_per_node[level_id-1]}
+#SBATCH --mem=2G
 #SBATCH --job-name={cfg.job_name}_kmeans_{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
 #SBATCH --error={save_dir}/logs/%j_0_log.err
-#SBATCH --time=4320
+#SBATCH --time=12:00:00
 #SBATCH --signal=USR2@300
 #SBATCH --open-mode=append\n"""
         )
@@ -80,6 +81,8 @@ f"""#!/usr/bin/env bash
 #SBATCH --requeue
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
 #SBATCH --gres=gpu:{cfg.ngpus_per_node[level_id-1]}
+#SBATCH --mem=2G
+#SBATCH --time=12:00:00
 #SBATCH --ntasks={cfg.nnodes[level_id-1]}
 #SBATCH --job-name={cfg.job_name}_kmeans_level{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
@@ -114,6 +117,11 @@ echo Node IP: $head_node_ip
 # activating a version of my environment
 conda activate {cfg.slurm_conda_env_dir}
 
+
+# logging in to weights and biases
+source /home/luketerry/.wandb_api_key.sh
+wandb login $WANDB_API_KEY
+
 PYTHONPATH=.. \\
 srun torchrun \\
 --rdzv_id $RANDOM \\
@@ -122,6 +130,7 @@ srun torchrun \\
 --nnodes=$SLURM_JOB_NUM_NODES \\
 --nproc_per_node={cfg.ngpus_per_node[level_id-1]} \\
     run_distributed_kmeans.py \\
+    --wandb_name {cfg.job_name} \\
     --use_torchrun \\
     --data_path {data_path} \\
     --n_clusters {cfg.n_clusters[level_id-1]} \\

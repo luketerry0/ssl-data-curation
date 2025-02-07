@@ -1,0 +1,26 @@
+2025-02-07 15:10:33,416 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Current SDK version is 0.17.8
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Configure stats pid to 9540
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Loading settings from /home/luketerry/.config/wandb/settings
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Loading settings from /home/luketerry/ssl-data-curation/scripts/wandb/settings
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Loading settings from environment variables: {}
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Applying setup settings: {'_disable_service': False}
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Inferring run settings from compute environment: {'program_relpath': 'scripts/run_distributed_kmeans.py', 'program_abspath': '/home/luketerry/ssl-data-curation/scripts/run_distributed_kmeans.py', 'program': '/home/luketerry/ssl-data-curation/scripts/run_distributed_kmeans.py'}
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_setup.py:_flush():77] Applying login settings: {}
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:_log_setup():524] Logging user logs to /home/luketerry/ssl-data-curation/scripts/wandb/run-20250207_151033-ljsp3wbi/logs/debug.log
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:_log_setup():525] Logging internal logs to /home/luketerry/ssl-data-curation/scripts/wandb/run-20250207_151033-ljsp3wbi/logs/debug-internal.log
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:init():607] calling init triggers
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:init():614] wandb.init called with sweep_config: {}
+config: {'wandb_name': 'hierarchical_test', 'data_path': '/ourdisk/hpc/ai2es/luketerry/npy_laion_embeddings/laion_embeddings_shard_0.npy', 'subset_indices_path': None, 'n_clusters': 2, 'chunk_size': 100000000, 'dtype': torch.float64, 'high_precision': torch.float64, 'checkpoint_period': 1000, 'sort_cluster_checkpoint_period': -1, 'exp_dir': '/ourdisk/hpc/ai2es/luketerry/test_config/level1', 'n_iters': 1, 'use_torchrun': True, 'n_steps': 1, 'sample_size': 1, 'sampling_strategy': 'c'}
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:init():657] starting backend
+2025-02-07 15:10:33,417 INFO    MainThread:9540 [wandb_init.py:init():661] setting up manager
+2025-02-07 15:10:33,422 INFO    MainThread:9540 [backend.py:_multiprocessing_setup():105] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-02-07 15:10:33,423 INFO    MainThread:9540 [wandb_init.py:init():669] backend started and connected
+2025-02-07 15:10:33,433 INFO    MainThread:9540 [wandb_init.py:init():767] updated telemetry
+2025-02-07 15:10:33,442 INFO    MainThread:9540 [wandb_init.py:init():800] communicating run to backend with 90.0 second timeout
+2025-02-07 15:10:33,643 INFO    MainThread:9540 [wandb_init.py:init():851] starting run threads in backend
+2025-02-07 15:10:37,715 INFO    MainThread:9540 [wandb_run.py:_console_start():2463] atexit reg
+2025-02-07 15:10:37,715 INFO    MainThread:9540 [wandb_run.py:_redirect():2309] redirect: wrap_raw
+2025-02-07 15:10:37,716 INFO    MainThread:9540 [wandb_run.py:_redirect():2374] Wrapping output streams.
+2025-02-07 15:10:37,716 INFO    MainThread:9540 [wandb_run.py:_redirect():2399] Redirects installed.
+2025-02-07 15:10:37,719 INFO    MainThread:9540 [wandb_init.py:init():894] run started, returning control to user process
+2025-02-07 15:11:14,683 WARNING MsgRouterThr:9540 [router.py:message_loop():77] message_loop has been closed
