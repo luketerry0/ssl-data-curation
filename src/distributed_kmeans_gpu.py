@@ -787,6 +787,8 @@ def distributed_sort_cluster_by_distance(
         bar_format="{l_bar}{bar}{r_bar}",
     ):
         point_indices = np.sort(clusters[cluster_idx])
+        print("POINT INDICES")
+        print(point_indices)
         point_feats = torch.tensor(X[point_indices], device=device, dtype=dtype)
         _centroid = torch.tensor(
             centroids[cluster_idx],
