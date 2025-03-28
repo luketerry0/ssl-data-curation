@@ -191,6 +191,44 @@ def distributed_squared_euclidean_distance(
         else:
             return None
 
+def distributed_cosine_distance(
+    X, Xi, Y, X_squared_norms, do_all_gather=False
+):
+    """
+    Compute cosine distance between X and Y.
+
+    Parameters:
+
+        X: mem_map of an array of shape (n_samples, n_features) or the array itself
+            Data.
+        Xi: torch.tensor
+            Part of data that is managed by the current device.
+        Y: torch.tensor
+            Same on all worker.
+        X_squared_norms: torch.tensor of shape (n_samples, )
+            Squared L2 norm of rows of X.
+        do_all_gather: bool
+            Whether to only store the final result in the main
+            process (False) or to have a copy of it in all processes (True). In the
+            former case, returns None except for the main process.
+
+    Returns:
+
+        Pairwise cosine distance between rows of X and Y.
+
+    """
+    y_norms = torch.linalg.vector_norm(Y, dim=1)
+    x_norms = torch.linalg.vector_norm(Xi, dim=1)
+    cosine_distance = torch.sub(1, distributed_matmul(X, Xi, Y.T, do_all_gather) / (x_norms * y_norms))
+
+    if do_all_gather:
+        return cosine_distance
+    else:
+        if is_main_process():
+            return cosine_distance
+        else:
+            return None
+
 
 def select_best_candidate(
     X,
@@ -749,6 +787,8 @@ def distributed_sort_cluster_by_distance(
         bar_format="{l_bar}{bar}{r_bar}",
     ):
         point_indices = np.sort(clusters[cluster_idx])
+        print("POINT INDICES")
+        print(point_indices)
         point_feats = torch.tensor(X[point_indices], device=device, dtype=dtype)
         _centroid = torch.tensor(
             centroids[cluster_idx],

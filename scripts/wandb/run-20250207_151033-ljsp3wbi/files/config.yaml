@@ -1,0 +1,76 @@
+wandb_version: 1
+
+wandb_name:
+  desc: null
+  value: hierarchical_test
+data_path:
+  desc: null
+  value: /ourdisk/hpc/ai2es/luketerry/npy_laion_embeddings/laion_embeddings_shard_0.npy
+subset_indices_path:
+  desc: null
+  value: null
+n_clusters:
+  desc: null
+  value: 2
+chunk_size:
+  desc: null
+  value: 100000000
+dtype:
+  desc: null
+  value: torch.float64
+high_precision:
+  desc: null
+  value: torch.float64
+checkpoint_period:
+  desc: null
+  value: 1000
+sort_cluster_checkpoint_period:
+  desc: null
+  value: -1
+exp_dir:
+  desc: null
+  value: /ourdisk/hpc/ai2es/luketerry/test_config/level1
+n_iters:
+  desc: null
+  value: 1
+use_torchrun:
+  desc: null
+  value: true
+n_steps:
+  desc: null
+  value: 1
+sample_size:
+  desc: null
+  value: 1
+sampling_strategy:
+  desc: null
+  value: c
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.15
+    cli_version: 0.17.8
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1738962633
+    t:
+      1:
+      - 1
+      - 5
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 53
+      - 55
+      3:
+      - 13
+      - 16
+      - 23
+      4: 3.10.15
+      5: 0.17.8
+      8:
+      - 5
+      13: linux-x86_64

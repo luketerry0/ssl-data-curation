@@ -1,0 +1,22 @@
+{'MASTER_ADDR': 'c314.oscer.ou.edu', 'MASTER_PORT': '43259', 'RANK': '0', 'WORLD_SIZE': '2', 'LOCAL_RANK': '0', 'LOCAL_WORLD_SIZE': '1'}
+I20250207 15:10:38 9540 hkmeans distributed_kmeans_gpu.py:94] Rank 0: Loading data
+I20250207 15:11:02 9540 hkmeans distributed_kmeans_gpu.py:101] Rank: 0, X.shape: (632718, 1024), Xi.shape: torch.Size([316359, 1024])
+I20250207 15:11:02 9540 hkmeans run_distributed_kmeans.py:69] Running step 0
+I20250207 15:11:02 9540 hkmeans run_distributed_kmeans.py:125] Begin distributed kmeans
+I20250207 15:11:03 9540 hkmeans distributed_kmeans_gpu.py:390] Initializing the first centroid
+I20250207 15:11:03 9540 hkmeans distributed_kmeans_gpu.py:432] Begin main loop
+Distributed kmeans++ initialization:   0%|          | 0/1 [00:00<?, ?it/s]I20250207 15:11:03 9540 hkmeans distributed_kmeans_gpu.py:494] Saving checkpoint to kmpp_checkpoint_1.pth
+Distributed kmeans++ initialization: 100%|██████████| 1/1 [00:00<00:00,  2.79it/s]
+I20250207 15:11:03 9540 hkmeans distributed_kmeans_gpu.py:517] Kmeans potential of kmeans++ initialization: 534899961.5197073
+Distributed kmeans interation: 100%|██████████| 1/1 [00:00<00:00,  5.60it/s]
+I20250207 15:11:04 9540 hkmeans run_distributed_kmeans.py:150] Assign points to clusters
+Assigning data points to centroids: 100%|██████████| 1/1 [00:00<00:00, 2671.53it/s]
+I20250207 15:11:04 9540 hkmeans run_distributed_kmeans.py:174] Create clusters from cluster_assignment
+I20250207 15:11:04 9540 hkmeans run_distributed_kmeans.py:189] Sort points in each cluster by distance to centroid
+Distributed sorting clusters by distance:   0%|          | 0/1 [00:00<?, ?it/s]I20250207 15:11:09 9540 hkmeans distributed_kmeans_gpu.py:810] Saving checkpoint to /ourdisk/hpc/ai2es/luketerry/test_config/level1/step0/sorted_clusters_checkpoint_0.npy
+Distributed sorting clusters by distance: 100%|██████████| 1/1 [00:05<00:00,  5.50s/it]
+I20250207 15:11:09 9540 hkmeans distributed_kmeans_gpu.py:820] Gathering clusters
+Distributed gathering sorted clusters: 100%|██████████| 2/2 [00:00<00:00, 75.06it/s]
+W20250207 15:11:09 9540 py.warnings warnings.py:109] /home/luketerry/.local/lib/python3.10/site-packages/torch/_weights_only_unpickler.py:529: UserWarning: Detected pickle protocol 4 in the checkpoint, which was not the default pickle protocol used by `torch.load` (2). The weights_only Unpickler might not support all instructions implemented by this protocol, please file an issue for adding support if you encounter this.
+  warnings.warn(
+I20250207 15:11:09 9540 hkmeans run_distributed_kmeans.py:226] Finished all steps!

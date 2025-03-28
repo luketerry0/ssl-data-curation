@@ -310,3 +310,7 @@ def synchronize():
     if world_size == 1:
         return
     dist.barrier()
+
+def cleanup():
+    # prevents rendezvouz errors
+    dist.destroy_process_group()

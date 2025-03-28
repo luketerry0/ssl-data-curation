@@ -11,13 +11,15 @@ import subprocess
 
 import numpy as np
 import torch
+import os
+import wandb
 
 from src import (
     distributed_kmeans_gpu as dkmg,
     kmeans_gpu as kmg,
     hierarchical_sampling as hs,
 )
-from src.dist_comm import enable_distributed, is_main_process, synchronize
+from src.dist_comm import enable_distributed, is_main_process, synchronize, cleanup
 from src.utils import get_last_valid_checkpoint, setup_logging
 
 
@@ -46,9 +48,10 @@ def main(args):
     enable_distributed(
         use_torchrun=args.use_torchrun,
         overwrite=True,
+        set_cuda_current_device=False
     )
 
-    X_ori = np.load(args.data_path, mmap_mode="r")
+    X_ori = np.load(args.data_path, mmap_mode="r", allow_pickle=True)
     if args.subset_indices_path is not None:
         logger.info(f"Using subset with indices in {args.subset_indices_path}")
         subset_indices = np.load(args.subset_indices_path)
@@ -224,7 +227,9 @@ def main(args):
 
 
 if __name__ == "__main__":
+    torch.cuda.set_device(int(os.environ['RANK']) % torch.cuda.device_count())
     parser = argparse.ArgumentParser()
+    parser.add_argument("--wandb_name", type=str, required=True, default="no name passed")
     parser.add_argument("--data_path", type=str, required=True)
     parser.add_argument("--subset_indices_path", type=str, default=None)
     parser.add_argument("--n_clusters", type=int, required=True)
@@ -278,5 +283,17 @@ if __name__ == "__main__":
 
     logger.info(f"Args: {args}")
 
+    # initialize wandb logging
+    run = wandb.init(
+        project="ssl-clustering",
+        entity='ai2es',
+        name=args.wandb_name,
+        config=args
+    )   
+
     main(args)
     synchronize()
+    
+    # prevents rendezvouz errors
+    cleanup()
+

@@ -32,12 +32,12 @@ ngpus_per_node:
 - 2
 - 2
 nnodes:
-- 3
-- 3
+- 1
+- 1
 ncpus_per_gpu: 10
 sampling_strategy: c
 slurm_partition: ai2es
 slurm_conda_env_dir: /home/luketerry/mambaforge/envs/ssl-data-curation
 slurm_email: luke.h.terry-1@ou.edu
 slurm_home_dir: /home/luketerry/ssl-data-curation
-job_name: 3node
+job_name: 1node

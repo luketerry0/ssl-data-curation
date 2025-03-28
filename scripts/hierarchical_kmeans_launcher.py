@@ -36,10 +36,11 @@ f"""#!/usr/bin/env bash
 #SBATCH --nodes={cfg.nnodes[level_id-1]}
 #SBATCH --gpus-per-node={cfg.ngpus_per_node[level_id-1]}
 #SBATCH --ntasks-per-node={cfg.ngpus_per_node[level_id-1]}
-#SBATCH --job-name=kmeans_level{level_id}
+#SBATCH --mem=2G
+#SBATCH --job-name={cfg.job_name}_kmeans_{level_id}
 #SBATCH --output={save_dir}/logs/%j_0_log.out
 #SBATCH --error={save_dir}/logs/%j_0_log.err
-#SBATCH --time=4320
+#SBATCH --time=12:00:00
 #SBATCH --signal=USR2@300
 #SBATCH --open-mode=append\n"""
         )
@@ -72,17 +73,64 @@ srun --unbuffered --output="$EXPDIR"/logs/%j_%t_log.out --error="$EXPDIR"/logs/%
         else:
             f.write("\n")
 
-    with open(Path(level_dir, "local_script.sh"), "w") as f:
+    with open(Path(level_dir, "OSCER-slurm-script.sh"), "w") as f:
+
         f.write(
 f"""#!/usr/bin/env bash
+
+#SBATCH --requeue
+#SBATCH --nodes={cfg.nnodes[level_id-1]}
+#SBATCH --gres=gpu:{cfg.ngpus_per_node[level_id-1]}
+#SBATCH --mem=2G
+#SBATCH --time=12:00:00
+#SBATCH --ntasks={cfg.nnodes[level_id-1]}
+#SBATCH --job-name={cfg.job_name}_kmeans_level{level_id}
+#SBATCH --output={save_dir}/logs/%j_0_log.out
+#SBATCH --error={save_dir}/logs/%j_0_log.err
+#SBATCH --mail-user={cfg.slurm_email}
+#SBATCH --mail-type=ALL
+#SBATCH --open-mode=append\n"""
+        )
+        if cfg.ncpus_per_gpu is not None:
+            f.write(f"#SBATCH --cpus-per-task={cfg.ncpus_per_gpu}\n")
+        if cfg.slurm_partition is not None:
+            f.write(f"#SBATCH --partition={cfg.slurm_partition}\n")
+        f.write(f"#SBATCH --chdir={cfg.slurm_home_dir}\n")
+
+        f.write(
+f"""
 EXPDIR={save_dir}
 cd {ROOT}
 
+# get the IP of the node used for the master process
+nodes=( $( scontrol show hostnames $SLURM_JOB_NODELIST ) )
+nodes_array=($nodes)
+head_node=${{nodes_array[0]}}
+""")
+        f.write('head_node_ip=$(srun --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address | grep -oE "\\b([0-9]{1,3}\.){3}[0-9]{1,3}\\b")')
+        f.write(f"""
+
+echo Node IP: $head_node_ip
+
+# using Dr. Fagg's conda setup script
+. /home/fagg/tf_setup.sh
+# activating a version of my environment
+conda activate {cfg.slurm_conda_env_dir}
+
+
+# logging in to weights and biases
+source /home/luketerry/.wandb_api_key.sh
+wandb login $WANDB_API_KEY
+
 PYTHONPATH=.. \\
-torchrun \\
---nnodes={cfg.nnodes[level_id-1]} \\
+srun torchrun \\
+--rdzv_id $RANDOM \\
+--rdzv_backend c10d \\
+--rdzv_endpoint "$head_node_ip:64425" \\
+--nnodes=$SLURM_JOB_NUM_NODES \\
 --nproc_per_node={cfg.ngpus_per_node[level_id-1]} \\
     run_distributed_kmeans.py \\
+    --wandb_name {cfg.job_name} \\
     --use_torchrun \\
     --data_path {data_path} \\
     --n_clusters {cfg.n_clusters[level_id-1]} \\
@@ -94,7 +142,8 @@ torchrun \\
     --exp_dir $EXPDIR \\
     --n_steps {cfg.n_resampling_steps[level_id-1]} \\
     --sample_size {cfg.sample_size[level_id-1]} \\
-    --sampling_strategy {cfg.sampling_strategy}"""
+    --sampling_strategy {cfg.sampling_strategy}
+"""
         )
         if level_id == 1 and cfg.subset_indices_path is not None:
             f.write(f" \\\n    --subset_indices_path {cfg.subset_indices_path}\n")
@@ -198,9 +247,9 @@ def write_launcher(exp_dir, n_levels, n_splits):
     Write bash script to launch slurm scripts in all levels.
     """
     exp_dir = Path(exp_dir).resolve()
-    with open(Path(exp_dir, "launcher.sh"), "w") as f:
+    with open(Path(exp_dir, "OSCER_launcher.sh"), "w") as f:
         f.write(
-            f"ID=$(sbatch --parsable {str(exp_dir)}/level1/slurm_script.s | tail -1)\n"
+            f"ID=$(sbatch --parsable {str(exp_dir)}/level1/OSCER-slurm-script.sh | tail -1)\n"
         )
         f.write('echo "Level 1: job $ID"\n')
         if n_splits[0] > 1:
@@ -211,7 +260,7 @@ def write_launcher(exp_dir, n_levels, n_splits):
 
         for level_id in range(2, n_levels + 1):
             f.write(
-                f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/slurm_script.s | tail -1)\n'
+                f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/OSCER-slurm-script.sh | tail -1)\n'
             )
             f.write(f'echo "Level {level_id}: job $ID"\n')
             if n_splits[level_id - 1] > 1:
@@ -219,18 +268,6 @@ def write_launcher(exp_dir, n_levels, n_splits):
                     f'ID=$(sbatch --parsable --dependency=afterok:"$ID" {str(exp_dir)}/level{level_id}/slurm_split_clusters_script.s | tail -1)\n'
                 )
                 f.write('echo "Level {level_id}, split clusters: job $ID"\n')
-
-def write_local_launcher(exp_dir, n_levels, n_splits):
-    """
-    Write bash script to launch slurm scripts in all levels.
-    """
-    exp_dir = Path(exp_dir).resolve()
-    with open(Path(exp_dir, "local_launcher.sh"), "w") as f:
-        f.write("set -e\n")
-        for level_id in range(1, n_levels + 1):
-            f.write(f"bash {str(exp_dir)}/level{level_id}/local_script.sh\n")
-            if n_splits[level_id - 1] > 1:
-                f.write(f"bash {str(exp_dir)}/level{level_id}/local_split_clusters_script.sh\n")
 
 
 if __name__ == "__main__":
@@ -261,4 +298,4 @@ if __name__ == "__main__":
 
     write_slurm_scripts(cfg)
     write_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
-    write_local_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
+    #write_local_launcher(cfg.exp_dir, cfg.n_levels, cfg.n_splits)
